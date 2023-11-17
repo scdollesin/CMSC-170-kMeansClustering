@@ -56,6 +56,7 @@ if (inputcsv.readable()):
 
     #determine k centroids from the dataset
     centroids = []
+    new_centroids = []
     clusters = []
     for i in range(k):
         c = []
@@ -64,31 +65,48 @@ if (inputcsv.readable()):
         c.append(dataset[r][att2])
         print(f"centroid {i}: {c[0]}, {c[1]} [{r}]")
         centroids.append(c)
+        new_centroids.append([])
         clusters.append([])
-    
-    #compute each data point's distance from the centroids
-    for v in dataset:
-        p = []
-        p.append(v[att1])
-        p.append(v[att2])
-        #print(p)
+    while(1):
+        #compute each data point's distance from the centroids
+        for v in dataset:
+            p = []
+            p.append(v[att1])
+            p.append(v[att2])
+            #print(p)
 
-        minDist = 999
-        c = -1 #cluster number
-        for i in range(len(centroids)):
-            dist = math.sqrt((p[0]-centroids[i][0])**2 + (p[1]-centroids[i][1])**2)
-            #print(dist)
-            if (dist < minDist):
-                minDist = dist
-                c= i
-        #print("cluster: " , c, "\n\n\n")
-        clusters[c].append(p)
+            minDist = 999
+            c = -1 #cluster number
+            for i in range(len(centroids)):
+                dist = math.sqrt((p[0]-centroids[i][0])**2 + (p[1]-centroids[i][1])**2)
+                #print(dist)
+                if (dist < minDist):
+                    minDist = dist
+                    c= i
+            #print("cluster: " , c, "\n\n\n")
+            clusters[c].append(p)
 
-    for c in clusters:
-        print(c)
-        print()
-        plt.scatter([i[0] for i in c],[i[1] for i in c])
+        for c in clusters:
+            #print(c)
+            #print()
+            plt.scatter([point[0] for point in c],[point[1] for point in c])
 
-    plt.xlabel(attributes[att1])
-    plt.ylabel(attributes[att2])
+        plt.xlabel(attributes[att1])
+        plt.ylabel(attributes[att2])
+        
+        for i in range(len(new_centroids)):
+            new_centroids[i].append((sum([point[0] for point in clusters[i]]))/len(clusters[i]))
+            new_centroids[i].append((sum([point[1] for point in clusters[i]]))/len(clusters[i]))
+
+        print("old: ", end='')
+        print(centroids)
+        print("new: ", end='')
+        print(new_centroids)
+        if (new_centroids == centroids):
+            print("done.")
+            break
+        else:
+            print("iterating again...")
+            centroids = new_centroids.copy()
+
     plt.show()
