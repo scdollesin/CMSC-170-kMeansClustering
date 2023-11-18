@@ -67,46 +67,55 @@ if (inputcsv.readable()):
         centroids.append(c)
         new_centroids.append([])
         clusters.append([])
-    while(1):
+
+    while (1):
         #compute each data point's distance from the centroids
         for v in dataset:
             p = []
             p.append(v[att1])
             p.append(v[att2])
-            #print(p)
 
+            #determine the cluster by searching for the smallest distance
             minDist = 999
             c = -1 #cluster number
             for i in range(len(centroids)):
                 dist = math.sqrt((p[0]-centroids[i][0])**2 + (p[1]-centroids[i][1])**2)
-                #print(dist)
                 if (dist < minDist):
                     minDist = dist
                     c= i
-            #print("cluster: " , c, "\n\n\n")
+            #append the point to the list of the cluster to which it belongs
             clusters[c].append(p)
 
+        #plot each cluster
         for c in clusters:
-            #print(c)
-            #print()
             plt.scatter([point[0] for point in c],[point[1] for point in c])
-
         plt.xlabel(attributes[att1])
         plt.ylabel(attributes[att2])
         
+        #compute for the new centroids
         for i in range(len(new_centroids)):
-            new_centroids[i].append((sum([point[0] for point in clusters[i]]))/len(clusters[i]))
-            new_centroids[i].append((sum([point[1] for point in clusters[i]]))/len(clusters[i]))
+            new_centroids[i].append((sum([point[0] for point in clusters[i]]))/len(clusters[i]))       #average of the x values
+            new_centroids[i].append((sum([point[1] for point in clusters[i]]))/len(clusters[i]))       #average of the y values
+        
+        print(">>>> OLD")
+        for x in centroids:
+            print(x)
+        print(">>>> NEW")
+        for x in new_centroids:
+            print(x)
+        print("EQUAL? ", centroids==new_centroids)
+        print(">>>> CLUSTERS")
+        for x in clusters:
+            print(x)
+            print()
 
-        print("old: ", end='')
-        print(centroids)
-        print("new: ", end='')
-        print(new_centroids)
-        if (new_centroids == centroids):
-            print("done.")
-            break
-        else:
-            print("iterating again...")
-            centroids = new_centroids.copy()
-
+        #if the new centroids are not the same as the previous centroids, replace the old centroids with the newly computed ones
+        if (centroids!=new_centroids):
+            for i in range(k):
+                centroids[i] = new_centroids[i].copy()
+                new_centroids[i].clear()                #empty out new_centroids and clusters lists
+                clusters[i].clear()
+        else: 
+            break   #otherwise, stop iterating
+            
     plt.show()
