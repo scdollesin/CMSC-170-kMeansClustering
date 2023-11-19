@@ -1,39 +1,18 @@
+# EXERCISE #8 K-MEANS CLUSTERING
+# AUTHOR: Samantha Shane C. Dollesin
+# STUDENT NO.: 2020-01893
+# SECTION: WX-1L
+# PROGRAM DESCRIPTION: This program takes a csv file containing data points and performs k-means clustering
+#                      given two attributes and a k value (from the user via the GUI) and displays a scatter plot
+
 import math
 import random
-import matplotlib.pyplot as plt
+import matplotlib.pyplot
 from tkinter import *
 import tkinter as tk
 import tkinter.scrolledtext as st 
-import time
 from matplotlib.figure import Figure 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
-def selectAttribute(attributes):
-    no_of_attribs = len(attributes)
-    for i in range(no_of_attribs):
-        print(f"[{i}] {attributes[i]}")
-    choice = 1
-
-    while (1):
-        choice = int(input("Select an attribute: "))
-        if (choice > (no_of_attribs - 1)) or (choice < 0):
-            print("Please enter a a valid attribute")
-        else:
-            break
-
-    return choice
-
-def getK():
-    k = 1
-    while (1):
-        k = int(input("Enter value of k: "))
-        if (k > 10):
-            print("10 maximum centroids allowed")
-        elif (k < 1):
-            print("Please enter a value greater than 0")
-        else:
-            break
-    return k
 
 def getData(file):
     dataset = file.read().split("\n")
@@ -60,15 +39,16 @@ if (inputcsv.readable()):
     frame1 = Frame(window, padx= 20, pady=20, height=452)
     frame1.grid(column=0, row=0, sticky="nswe")
 
+    #attribute 1
     att1_label = Label(frame1, text = "Attribute 1", anchor="w", justify="left").grid(column=0, row=0, sticky="w")
     att1_str = StringVar(frame1)
     att1_str.set(attributes[0]) # default value
     att1 = 0
     att1_menu = OptionMenu(frame1, att1_str, *attributes)
     att1_menu.config(width=15)
-    #att1_menu.grid_propagate(0)
+    att1_menu.grid_propagate(0)
     att1_menu.grid(column=1, row=0)
-
+    #attribute 2
     att2_label = Label(frame1, text = "Attribute 2", anchor="w", justify="left").grid(column=0, row=1, sticky="w")
     att2_str = StringVar(frame1)
     att2_str.set(attributes[1]) # default value
@@ -77,10 +57,10 @@ if (inputcsv.readable()):
     att2_menu.config(width=15)
     att2_menu.grid_propagate(0)
     att2_menu.grid(column=1, row=1)
-    
+    #value for k
     k_label = Label(frame1, text = "k Value", anchor="w", justify="left").grid(column=0, row=2, sticky="w")
     k_str = StringVar(frame1)
-    k_str.set(1) # default value
+    k_str.set(3) # default value
     k = 1
     k_menu = OptionMenu(frame1, k_str, *[1,2,3,4,5,6,7,8,9,10])
     k_menu.config(width=15)
@@ -90,7 +70,7 @@ if (inputcsv.readable()):
     frame2 = Frame(window, height=452, bg= "white")
     frame2.grid(column=1, row=0, sticky="nswe")
 
-    #get values for 1st and 2nd attribute and k
+    #get values for 1st and 2nd attribute and k when run button is pressed then proceed to computation
     def run():
         global att1
         global att2
@@ -198,9 +178,11 @@ if (inputcsv.readable()):
         text_area.delete('1.0', END)
         text_area.insert(tk.INSERT, output_disp) 
 
+    #create run button
     button = Button(frame1, text="RUN", command=run, width=10)
     button.grid(column=0, row=3, sticky="w")
 
+    #set text area properties
     txtarea_label = Label(frame1, text = "Centoids & Clusters          ", anchor="e", justify="right").grid(column=1, row=4, sticky="e")
     text_area = st.ScrolledText(frame1, width = 32, height = 17, font = ("Consolas", 10))
     text_area.grid(column = 0, pady = 10, padx = 10, columnspan=2)
