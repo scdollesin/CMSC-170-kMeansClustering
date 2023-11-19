@@ -2,6 +2,8 @@ import math
 import random
 import matplotlib.pyplot as plt
 from tkinter import *
+import tkinter as tk
+import tkinter.scrolledtext as st 
 import time
 from matplotlib.figure import Figure 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -51,22 +53,23 @@ if (inputcsv.readable()):
 
     #set window properties
     window = Tk()
-    window.geometry("680x452")
+    window.geometry("750x452")
     window.config(bg = "white")
+    window.title("KMeans Clustering")
 
     frame1 = Frame(window, padx= 20, pady=20, height=452)
     frame1.grid(column=0, row=0, sticky="nswe")
 
-    att1_label = Label(frame1, text = "Attribute 1", anchor="w", justify="left").grid(column=0, row=0)
+    att1_label = Label(frame1, text = "Attribute 1", anchor="w", justify="left").grid(column=0, row=0, sticky="w")
     att1_str = StringVar(frame1)
     att1_str.set(attributes[0]) # default value
     att1 = 0
     att1_menu = OptionMenu(frame1, att1_str, *attributes)
     att1_menu.config(width=15)
-    att1_menu.grid_propagate(0)
+    #att1_menu.grid_propagate(0)
     att1_menu.grid(column=1, row=0)
 
-    att2_label = Label(frame1, text = "Attribute 2", anchor="w", justify="left").grid(column=0, row=1)
+    att2_label = Label(frame1, text = "Attribute 2", anchor="w", justify="left").grid(column=0, row=1, sticky="w")
     att2_str = StringVar(frame1)
     att2_str.set(attributes[1]) # default value
     att2 = 1
@@ -75,7 +78,7 @@ if (inputcsv.readable()):
     att2_menu.grid_propagate(0)
     att2_menu.grid(column=1, row=1)
     
-    k_label = Label(frame1, text = "k Value", anchor="w", justify="left").grid(column=0, row=2)
+    k_label = Label(frame1, text = "k Value", anchor="w", justify="left").grid(column=0, row=2, sticky="w")
     k_str = StringVar(frame1)
     k_str.set(1) # default value
     k = 1
@@ -86,7 +89,7 @@ if (inputcsv.readable()):
 
     frame2 = Frame(window, height=452, bg= "white")
     frame2.grid(column=1, row=0, sticky="nswe")
-    
+
     #get values for 1st and 2nd attribute and k
     def run():
         global att1
@@ -180,7 +183,7 @@ if (inputcsv.readable()):
         canvas.get_tk_widget().grid(column=0, row=0)
 
         #export to output file
-        output = open("output.txt", "w")
+        output = open("output.csv", "w")
         output_disp = ""
         for i in range(len(centroids)):
             output.write(f"Centroid {i}: {centroids[i]}\n")
@@ -191,10 +194,15 @@ if (inputcsv.readable()):
             output.write("\n")
             output_disp = output_disp + "\n"
 
-        output_label = Label(frame1, text=output_disp, anchor="w", justify="left")
-        output_label.grid(column=0, row=5)
+        #display in text area
+        text_area.delete('1.0', END)
+        text_area.insert(tk.INSERT, output_disp) 
 
-    button = Button(frame1, text="RUN", command=run)
-    button.grid(column=0, row=4, columnspan=2)
+    button = Button(frame1, text="RUN", command=run, width=10)
+    button.grid(column=0, row=3, sticky="w")
+
+    txtarea_label = Label(frame1, text = "Centoids & Clusters          ", anchor="e", justify="right").grid(column=1, row=4, sticky="e")
+    text_area = st.ScrolledText(frame1, width = 32, height = 17, font = ("Consolas", 10))
+    text_area.grid(column = 0, pady = 10, padx = 10, columnspan=2)
 
     window.mainloop()
