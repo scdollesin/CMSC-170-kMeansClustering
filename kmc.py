@@ -79,7 +79,7 @@ if (inputcsv.readable()):
     k_str = StringVar(frame1)
     k_str.set(1) # default value
     k = 1
-    k_menu = OptionMenu(frame1, k_str, *[1,2,3,4,5,6,7,8,9,50])
+    k_menu = OptionMenu(frame1, k_str, *[1,2,3,4,5,6,7,8,9,10])
     k_menu.config(width=15)
     k_menu.grid_propagate(0)
     k_menu.grid(column=1, row=2)
@@ -95,15 +95,13 @@ if (inputcsv.readable()):
         att1 = attributes.index(att1_str.get())
         att2 = attributes.index(att2_str.get())
         k = int(k_str.get())
-        print ("att1:", att1)
-        print ("att2:", att2)
-        print ("k:", k)
 
         #determine k centroids from the dataset
         centroids = []
         new_centroids = []
         clusters = []
         selected = []
+        print("initial centroids: ")
         for i in range(k):
             c = []
             
@@ -139,19 +137,6 @@ if (inputcsv.readable()):
                 #append the point to the list of the cluster to which it belongs
                 clusters[c].append(p)
 
-                # the figure that will contain the plot 
-                fig = Figure(figsize = (4.5, 4.5), 
-                            dpi = 100) 
-            
-                # adding the subplot 
-                plot1 = fig.add_subplot(111) 
-
-            #plot each cluster
-            for c in clusters:
-                plot1.scatter([point[0] for point in c],[point[1] for point in c])
-            plot1.set_xlabel(attributes[att1])
-            plot1.set_ylabel(attributes[att2])
-
             #print(">>>> CLUSTERS")
             #for x in clusters:
             #    print(x)
@@ -168,7 +153,7 @@ if (inputcsv.readable()):
             #print(">>>> NEW")
             #for x in new_centroids:
             #    print(x)
-            print("EQUAL? ", centroids==new_centroids)
+            #print("EQUAL? ", centroids==new_centroids)
 
             #if the new centroids are not the same as the previous centroids, replace the old centroids with the newly computed ones
             if (centroids!=new_centroids):
@@ -178,16 +163,36 @@ if (inputcsv.readable()):
                     clusters[i].clear()
             else: 
                 break   #otherwise, stop iterating
-    
-        # creating the Tkinter canvas 
-        # containing the Matplotlib figure 
-        canvas = FigureCanvasTkAgg(fig, master = frame2)   
-        canvas.draw() 
-    
-        # placing the canvas on the Tkinter window 
-        canvas.get_tk_widget().grid(column=0, row=0) 
 
-        plt.show()
+        #create figure containing the plot
+        fig = Figure(figsize = (4.5, 4.5), dpi = 100) 
+        plot1 = fig.add_subplot(111) 
+
+        #plot each cluster
+        for c in clusters:
+            plot1.scatter([point[0] for point in c],[point[1] for point in c])
+        plot1.set_xlabel(attributes[att1])
+        plot1.set_ylabel(attributes[att2])
+
+        #embed the figure onto the window
+        canvas = FigureCanvasTkAgg(fig, master = frame2)   
+        canvas.draw()
+        canvas.get_tk_widget().grid(column=0, row=0)
+
+        #export to output file
+        output = open("output.txt", "w")
+        output_disp = ""
+        for i in range(len(centroids)):
+            output.write(f"Centroid {i}: {centroids[i]}\n")
+            output_disp = output_disp + f"Centroid {i}: {centroids[i]}" + "\n"
+            for j in range(len(clusters[i])):
+                output.write(f"{clusters[i][j]}\n")
+                output_disp = output_disp + f"{clusters[i][j]}\n"
+            output.write("\n")
+            output_disp = output_disp + "\n"
+
+        output_label = Label(frame1, text=output_disp, anchor="w", justify="left")
+        output_label.grid(column=0, row=5)
 
     button = Button(frame1, text="RUN", command=run)
     button.grid(column=0, row=4, columnspan=2)
