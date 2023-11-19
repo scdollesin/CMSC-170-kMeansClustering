@@ -1,6 +1,8 @@
 import math
 import random
 import matplotlib.pyplot as plt
+from tkinter import *
+import time
 
 def selectAttribute(attributes):
     no_of_attribs = len(attributes)
@@ -44,23 +46,72 @@ def getData(file):
 
     return attributes, dataset
 
-
 inputcsv = open("08 Data Wine.csv")
 if (inputcsv.readable()):
     #read input file
     attributes, dataset = getData(inputcsv)
+
+    #set window properties
+    window = Tk()
+    window.geometry("1080x720")
+    att1_label = Label(window, text = "Attribute 1").pack()
+    att1_str = StringVar(window)
+    att1_str.set(attributes[0]) # default value
+    att1 = 0
+    att1_menu = OptionMenu(window, att1_str, *attributes)
+    att1_menu.pack()
+
+    att2_label = Label(window, text = "Attribute 2").pack()
+    att2_str = StringVar(window)
+    att2_str.set(attributes[1]) # default value
+    att2 = 1
+    att2_menu = OptionMenu(window, att2_str, *attributes)
+    att2_menu.pack()
+    
+    k_label = Label(window, text = "k").pack()
+    k_str = StringVar(window)
+    k_str.set(1) # default value
+    k = 1
+    k_menu = OptionMenu(window, k_str, *[1,2,3,4,5,6,7,8,9,50])
+    k_menu.pack()
+    
+    def run():
+        global att1
+        global att2
+        global k
+        att1 = attributes.index(att1_str.get())
+        att2 = attributes.index(att2_str.get())
+        k = int(k_str.get())
+        print ("att1:", att1)
+        print ("att2:", att2)
+        print ("k:", k)
+
+
+    button = Button(window, text="RUN", command=run)
+    button.pack()
+
+    window.mainloop()
+
     #ask for 1st and 2nd attribute and the value of k
-    att1 = selectAttribute(attributes)
-    att2 = selectAttribute(attributes)
-    k = getK()
+    #att1 = selectAttribute(attributes)
+    #att2 = selectAttribute(attributes)
+    #k = getK()
 
     #determine k centroids from the dataset
     centroids = []
     new_centroids = []
     clusters = []
+    selected = []
     for i in range(k):
         c = []
-        r = random.randint(1, (len(dataset) - 1))
+        
+        #make sure no centroids are the same
+        while 1:
+            r = random.randint(1, (len(dataset) - 1))
+            if (r not in selected):
+                selected.append(r)
+                break
+
         c.append(dataset[r][att1])
         c.append(dataset[r][att2])
         print(f"centroid {i}: {c[0]}, {c[1]} [{r}]")
@@ -91,23 +142,24 @@ if (inputcsv.readable()):
             plt.scatter([point[0] for point in c],[point[1] for point in c])
         plt.xlabel(attributes[att1])
         plt.ylabel(attributes[att2])
+
+        #print(">>>> CLUSTERS")
+        #for x in clusters:
+        #    print(x)
+        #    print()
         
         #compute for the new centroids
         for i in range(len(new_centroids)):
             new_centroids[i].append((sum([point[0] for point in clusters[i]]))/len(clusters[i]))       #average of the x values
             new_centroids[i].append((sum([point[1] for point in clusters[i]]))/len(clusters[i]))       #average of the y values
         
-        print(">>>> OLD")
-        for x in centroids:
-            print(x)
-        print(">>>> NEW")
-        for x in new_centroids:
-            print(x)
+        #print(">>>> OLD")
+        #for x in centroids:
+        #    print(x)
+        #print(">>>> NEW")
+        #for x in new_centroids:
+        #    print(x)
         print("EQUAL? ", centroids==new_centroids)
-        print(">>>> CLUSTERS")
-        for x in clusters:
-            print(x)
-            print()
 
         #if the new centroids are not the same as the previous centroids, replace the old centroids with the newly computed ones
         if (centroids!=new_centroids):
@@ -117,5 +169,5 @@ if (inputcsv.readable()):
                 clusters[i].clear()
         else: 
             break   #otherwise, stop iterating
-            
+
     plt.show()
